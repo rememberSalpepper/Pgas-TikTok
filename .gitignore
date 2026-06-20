@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+pgas-generator/node_modules/
+
+# Imágenes generadas (se regeneran en cada máquina/VPS)
+pgas-generator/dist/*
+!pgas-generator/dist/.gitkeep
+
+# Respaldos del CSV
+*.backup*.csv
+
+# Fuentes de referencia (insumos, no parte del pipeline)
+WhatsApp Image*.jpeg
+candidate-*.png
+candidate-*.webp
+
+# Sistema
+.DS_Store
