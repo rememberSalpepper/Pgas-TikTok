@@ -10,7 +10,9 @@
     "render:all": "node src/pipeline.js all",
     "render:one": "node src/pipeline.js one",
     "generate": "node src/generate.js",
-    "expand": "node src/expand-descriptions.js"
+    "expand": "node src/expand-descriptions.js",
+    "telegram": "node src/telegram.js",
+    "bot": "node src/bot.js"
   },
   "keywords": [],
   "author": "",

@@ -1,3 +1,7 @@
+# Secretos (token de Telegram, etc.) — NUNCA subir al repo
+.env
+pgas-generator/.env
+
 # Dependencias
 node_modules/
 pgas-generator/node_modules/

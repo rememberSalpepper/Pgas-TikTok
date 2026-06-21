@@ -34,7 +34,7 @@ async function main() {
   let targets;
   if (mode === 'all') targets = rows;
   else if (mode === 'one') targets = rows.filter((r) => r.id === arg);
-  else targets = rows.filter((r) => r.estado !== 'realizado');
+  else targets = rows.filter((r) => r.estado !== 'renderizado' && r.estado !== 'enviado');
 
   if (targets.length === 0) { console.log('No hay ideas que renderizar para el modo:', mode); return; }
   console.log(`Renderizando ${targets.length} imagen(es) [modo: ${mode}]...`);
@@ -46,8 +46,7 @@ async function main() {
       const rel = `dist/${row.id}.png`;
       const out = join(ROOT, rel);
       await renderToPng(rowToData(row), out, browser);
-      row.estado = 'realizado';
-      row.fecha_realizado = row.fecha_realizado || today;
+      if (row.estado !== 'enviado') row.estado = 'renderizado'; // no degradar lo ya enviado
       row.imagen_url = rel;
       done++;
       console.log(`  ✓ ${row.id}  (${row.tipo_plantilla})  -> ${rel}`);

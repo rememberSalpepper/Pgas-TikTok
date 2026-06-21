@@ -7,6 +7,7 @@
 //   PGAS_CODEX_MODEL   modelo a usar en codex (-m)
 //   PGAS_CSV           ruta del CSV
 
+import './env.js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { readFileSync, writeFileSync, openSync, closeSync } from 'node:fs';
