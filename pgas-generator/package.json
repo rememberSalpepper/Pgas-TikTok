@@ -8,7 +8,9 @@
     "lint": "node src/lint.js",
     "render": "node src/pipeline.js pending",
     "render:all": "node src/pipeline.js all",
-    "render:one": "node src/pipeline.js one"
+    "render:one": "node src/pipeline.js one",
+    "generate": "node src/generate.js",
+    "expand": "node src/expand-descriptions.js"
   },
   "keywords": [],
   "author": "",

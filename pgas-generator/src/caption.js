@@ -4,8 +4,11 @@
 
 const POINT_PREFIX = '👇\n👇\n👇\n👇\n';
 
+// Quita los *asteriscos* de énfasis (sirven solo para resaltar en la imagen, no en el caption).
+const stripEmphasis = (s) => s.replace(/\*(.+?)\*/g, '$1');
+
 export function buildCaption(row) {
-  const desc = (row.descripcion || '').trim();
+  const desc = stripEmphasis((row.descripcion || '').trim());
   const tags = (row.hashtags || '').trim();
   return `${POINT_PREFIX}${desc}\n\n${tags}`;
 }

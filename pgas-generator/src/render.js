@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { buildCss } from './theme.js';
-import { templates, icons } from './templates.js';
+import { templates, icons, esc } from './templates.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -38,29 +38,31 @@ export function renderHtml(data) {
   const css = buildCss({ fontFace });
   const body = templates[data.tipo](data);
   const headline = data.headline ?? hookToHeadline(data.hook);
+  const cta = data.cta || { title: 'Sígueme para más', sub: 'SEO, AEO y GEO sin enredos.' };
+  const bg = data.bg || 1; // variante de fondo (1-4)
 
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
   <style>${css}</style></head>
   <body><div class="canvas">
-    <div class="bg">
+    <div class="bg v${bg}">
       <div class="bg-base"></div>
       <div class="blob a"></div><div class="blob b"></div>
-      <div class="dots tr"></div><div class="dots bl"></div>
+      <div class="dots d1"></div><div class="dots d2"></div>
     </div>
     <div class="content">
       <div class="brand">
         <img src="${birdDataUri}" alt="">
         <span class="wm">Pgas</span>
       </div>
-      ${data.badge ? `<div class="badge">${data.badge}</div>` : ''}
+      ${data.badge ? `<div class="badge">${esc(data.badge)}</div>` : ''}
       <h1 class="headline">${headline}</h1>
-      ${data.subtitle ? `<p class="subtitle">${data.subtitle}</p>` : ''}
+      ${data.subtitle ? `<p class="subtitle">${esc(data.subtitle)}</p>` : ''}
       <div class="body">${body}</div>
       <div class="cta">
         <div class="ic">${icons.chatIcon}</div>
-        <div class="tx"><b>${data.cta.title}</b><span>${data.cta.sub}</span></div>
+        <div class="tx"><b>${esc(cta.title)}</b><span>${esc(cta.sub)}</span></div>
       </div>
-      <div class="footer">${icons.globeIcon}<span>${data.footer || 'www.pgas.online'}</span></div>
+      <div class="footer">${icons.globeIcon}<span>${esc(data.footer || 'www.pgas.online')}</span></div>
     </div>
   </div></body></html>`;
 }
@@ -73,7 +75,7 @@ export async function renderToPng(data, outPath, existingBrowser = null) {
     deviceScaleFactor: 2, // salida 2160x3840 -> máxima nitidez
   });
   await page.setContent(html, { waitUntil: 'networkidle' });
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(() => document.fonts.ready.then(() => true));
   await page.locator('.canvas').screenshot({ path: outPath });
   await page.close();
   if (!existingBrowser) await browser.close();

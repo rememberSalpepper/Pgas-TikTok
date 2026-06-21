@@ -38,7 +38,8 @@ ${fontFace}
 html, body { width: 1080px; height: 1920px; }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  /* Fallbacks anchos (Noto/DejaVu) para glifos fuera del subset latino en el VPS Linux */
+  font-family: 'Inter', 'Noto Sans', 'DejaVu Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
 }
@@ -52,27 +53,56 @@ body {
   background: var(--bg-1);
 }
 
-/* ---------- Fondo a sangre completa (cubre el 100%, márgenes incluidos) ---------- */
-.bg { position: absolute; inset: 0; z-index: 0; }
-.bg-base {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(1200px 900px at 80% -8%, #EFF5FF 0%, rgba(239,245,255,0) 60%),
-    radial-gradient(1100px 1000px at 0% 108%, #EAF3FF 0%, rgba(234,243,255,0) 55%),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-}
-/* Blobs muy sutiles, viven en las zonas calmas sin competir con el contenido */
-.blob { position: absolute; border-radius: 50%; filter: blur(2px); opacity: 0.16; }
-.blob.a { width: 360px; height: 360px; top: -120px; left: -110px; background: var(--grad-brand); }
-.blob.b { width: 300px; height: 300px; bottom: -110px; right: -90px; background: var(--grad-cta); opacity: 0.14; }
-/* Retícula de puntos decorativa */
+/* ---------- Fondo a sangre completa (cubre el 100%, márgenes incluidos) ----------
+   4 variantes minimalistas en la paleta PGAS. Se rotan por post para dar variedad
+   sin perder identidad. El contenido (cards blancas) se lee bien sobre todas. */
+.bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.bg-base { position: absolute; inset: 0; }
+.blob { position: absolute; border-radius: 50%; filter: blur(2px); }
 .dots {
   position: absolute; width: 150px; height: 150px;
   background-image: radial-gradient(var(--blue) 2px, transparent 2px);
   background-size: 26px 26px; opacity: 0.12;
 }
-.dots.tr { top: 120px; right: 70px; }
-.dots.bl { bottom: 120px; left: 70px; }
+
+/* Variante 1 — glows azules (esquinas opuestas) */
+.v1 .bg-base { background:
+  radial-gradient(1200px 900px at 80% -8%, #EFF5FF 0%, rgba(239,245,255,0) 60%),
+  radial-gradient(1100px 1000px at 0% 108%, #EAF3FF 0%, rgba(234,243,255,0) 55%),
+  linear-gradient(180deg, #F7FAFF 0%, #E9F0FF 100%); }
+.v1 .blob.a { width: 360px; height: 360px; top: -120px; left: -110px; background: var(--grad-brand); opacity: 0.16; }
+.v1 .blob.b { width: 300px; height: 300px; bottom: -110px; right: -90px; background: var(--grad-cta); opacity: 0.14; }
+.v1 .dots.d1 { top: 120px; right: 70px; }
+.v1 .dots.d2 { bottom: 120px; left: 70px; }
+
+/* Variante 2 — toque turquesa, glows cruzados */
+.v2 .bg-base { background:
+  radial-gradient(1100px 900px at 0% -6%, #E7FBF3 0%, rgba(231,251,243,0) 58%),
+  radial-gradient(1200px 1000px at 100% 106%, #EAF1FF 0%, rgba(234,241,255,0) 55%),
+  linear-gradient(160deg, #F6FBFA 0%, #E8F1FF 100%); }
+.v2 .blob.a { width: 340px; height: 340px; top: -110px; right: -100px; background: var(--grad-cta); opacity: 0.15; }
+.v2 .blob.b { width: 300px; height: 300px; bottom: -110px; left: -90px; background: var(--grad-brand); opacity: 0.14; }
+.v2 .dots.d1 { top: 120px; left: 70px; }
+.v2 .dots.d2 { bottom: 120px; right: 70px; }
+
+/* Variante 3 — muy limpia, un solo glow central-inferior */
+.v3 .bg-base { background:
+  radial-gradient(1000px 820px at 50% 36%, #EFF6FF 0%, rgba(239,246,255,0) 62%),
+  linear-gradient(180deg, #FAFBFF 0%, #EEF4FF 100%); }
+.v3 .blob.a { width: 440px; height: 440px; bottom: -170px; left: 50%; transform: translateX(-50%); background: var(--grad-cta); opacity: 0.10; }
+.v3 .blob.b { display: none; }
+.v3 .dots.d1 { top: 120px; right: 70px; }
+.v3 .dots.d2 { display: none; }
+
+/* Variante 4 — dos glows superiores (verde + azul) */
+.v4 .bg-base { background:
+  radial-gradient(900px 820px at 10% -8%, #E8F6F0 0%, rgba(232,246,240,0) 55%),
+  radial-gradient(900px 820px at 100% -6%, #E9F0FF 0%, rgba(233,240,255,0) 55%),
+  linear-gradient(200deg, #F5F9FF 0%, #EAF2FF 100%); }
+.v4 .blob.a { width: 300px; height: 300px; top: -120px; left: -90px; background: var(--grad-brand); opacity: 0.14; }
+.v4 .blob.b { width: 300px; height: 300px; top: -120px; right: -90px; background: var(--grad-cta); opacity: 0.12; }
+.v4 .dots.d1 { bottom: 120px; left: 70px; }
+.v4 .dots.d2 { display: none; }
 
 /* ---------- Zona de contenido (entre los 280px calmos) ---------- */
 .content {

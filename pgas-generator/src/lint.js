@@ -18,6 +18,7 @@ for (const r of rows) {
   if (!tags.includes('#pgas')) errors.push(`${r.id}: falta #pgas.`);
   if (!TIPOS.includes(r.tipo_plantilla)) errors.push(`${r.id}: tipo_plantilla desconocido "${r.tipo_plantilla}".`);
   if (!r.hook) errors.push(`${r.id}: falta hook.`);
+  if ((r.descripcion || '').length < 1200) errors.push(`${r.id}: descripción muy corta (${(r.descripcion || '').length} car., mínimo 1200).`);
   try { JSON.parse(r.imagen_json); } catch { errors.push(`${r.id}: imagen_json inválido o vacío.`); }
 }
 

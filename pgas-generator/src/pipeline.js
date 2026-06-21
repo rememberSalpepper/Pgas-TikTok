@@ -21,7 +21,10 @@ const today = new Date().toISOString().slice(0, 10);
 
 function rowToData(row) {
   const content = JSON.parse(row.imagen_json);
-  return { tipo: row.tipo_plantilla, hook: row.hook, ...content };
+  // Fondo: usa el del contenido si existe, si no rota 1-4 por número de idea.
+  const num = parseInt(String(row.id).replace(/\D/g, ''), 10) || 1;
+  const bg = content.bg || ((num - 1) % 4) + 1;
+  return { tipo: row.tipo_plantilla, hook: row.hook, ...content, bg };
 }
 
 async function main() {
@@ -37,19 +40,24 @@ async function main() {
   console.log(`Renderizando ${targets.length} imagen(es) [modo: ${mode}]...`);
 
   const browser = await openBrowser();
-  for (const row of targets) {
-    const rel = `dist/${row.id}.png`;
-    const out = join(ROOT, rel);
-    await renderToPng(rowToData(row), out, browser);
-    row.estado = 'realizado';
-    row.fecha_realizado = row.fecha_realizado || today;
-    row.imagen_url = rel;
-    console.log(`  ✓ ${row.id}  (${row.tipo_plantilla})  -> ${rel}`);
+  let done = 0;
+  try {
+    for (const row of targets) {
+      const rel = `dist/${row.id}.png`;
+      const out = join(ROOT, rel);
+      await renderToPng(rowToData(row), out, browser);
+      row.estado = 'realizado';
+      row.fecha_realizado = row.fecha_realizado || today;
+      row.imagen_url = rel;
+      done++;
+      console.log(`  ✓ ${row.id}  (${row.tipo_plantilla})  -> ${rel}`);
+    }
+  } finally {
+    await browser.close();
+    // Guarda el progreso aunque algo falle a mitad de camino.
+    if (done > 0) writeFileSync(CSV, stringify(rows, { header: true, columns: Object.keys(rows[0]) }));
   }
-  await browser.close();
-
-  writeFileSync(CSV, stringify(rows, { header: true, columns: Object.keys(rows[0]) }));
-  console.log('CSV actualizado: estado=realizado, fecha_realizado, imagen_url.');
+  console.log(`CSV actualizado (${done}/${targets.length}): estado, fecha_realizado, imagen_url.`);
 }
 
 main();

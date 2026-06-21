@@ -15,27 +15,31 @@ const P = {
   brain: '<path d="M9.5 4A3 3 0 0 0 6.6 7 3 3 0 0 0 5 12.5 3 3 0 0 0 8 17a2.4 2.4 0 0 0 4-.5V5.6A2.4 2.4 0 0 0 9.5 4z"/><path d="M14.5 4A3 3 0 0 1 17.4 7 3 3 0 0 1 19 12.5 3 3 0 0 1 16 17a2.4 2.4 0 0 1-4-.5"/>',
   shield: '<path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2.2 2.2L15 10.4"/>',
   check: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
 };
 function svg(name, size = 44) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${P[name] || P.check}</svg>`;
 }
 
+// Escapa texto dinámico para no romper el HTML (contenido viene del CSV/Codex).
+export const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 const chatIcon = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
   stroke-linecap="round" stroke-linejoin="round">${P.chat}</svg>`;
 const globeIcon = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"
   stroke-linecap="round" stroke-linejoin="round">${P.globe}</svg>`;
-const closer = (txt) => `<div class="closer"><div class="ic">${svg('check', 28)}</div><span>${txt}</span></div>`;
+const closer = (txt) => `<div class="closer"><div class="ic">${svg('check', 28)}</div><span>${esc(txt)}</span></div>`;
 
 // ---------- CHECKLIST ----------
 export function checklist(data) {
-  const rows = data.items.map((it, i) => `
+  const rows = data.items.slice(0, 6).map((it, i) => `
     <div class="ck-row">
       <div class="ck-num">${i + 1}</div>
-      <div class="ck-tx">${it}</div>
+      <div class="ck-tx">${esc(it)}</div>
       <div class="ck-ck">${svg('check', 30)}</div>
     </div>`).join('');
-  const note = data.note ? `<div class="ck-note"><span class="ck-note-ic">!</span><span>${data.note}</span></div>` : '';
+  const note = data.note ? `<div class="ck-note"><span class="ck-note-ic">!</span><span>${esc(data.note)}</span></div>` : '';
   return `<style>
     .ck-card { background: var(--card); border-radius: 32px; box-shadow: var(--shadow);
       padding: 26px 32px; display: flex; flex-direction: column; border: 1px solid var(--line); }
@@ -60,9 +64,9 @@ export function checklist(data) {
 // ---------- BASE 3 CARDS ----------
 export function base_3_cards(data) {
   const grads = ['g1', 'g2', 'g1'];
-  const cards = data.cards.map((c, i) => `
+  const cards = data.cards.slice(0, 3).map((c, i) => `
     <div class="card"><div class="ic ${grads[i % 3]}">${svg(c.icon, 50)}</div>
-      <div class="tx"><h3>${c.title}</h3><p>${c.text}</p></div></div>`).join('');
+      <div class="tx"><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p></div></div>`).join('');
   return `<style>
     .cards { display: flex; flex-direction: column; gap: 18px; }
     .card { display: flex; align-items: center; gap: 26px; background: var(--card); border: 1px solid var(--line);
@@ -90,8 +94,8 @@ export function mito_realidad(data) {
     .mr .col p { font-size: 33px; line-height: 1.32; color: var(--navy); font-weight: 500; }
   </style>
   <div class="mr">
-    <div class="col mito"><span class="lbl">✕ Mito</span><p>${data.mito}</p></div>
-    <div class="col real"><span class="lbl">✓ Realidad</span><p>${data.realidad}</p></div>
+    <div class="col mito"><span class="lbl">${svg('x', 22)} Mito</span><p>${esc(data.mito)}</p></div>
+    <div class="col real"><span class="lbl">${svg('check', 22)} Realidad</span><p>${esc(data.realidad)}</p></div>
   </div>${data.cierre ? closer(data.cierre) : ''}`;
 }
 
@@ -108,17 +112,17 @@ export function piramide(data) {
     .pyr .l3 { width: 100%; background: linear-gradient(135deg, var(--blue), var(--blue-d)); }
   </style>
   <div class="pyr">
-    <div class="lvl l1">${p.top}</div>
-    <div class="lvl l2">${p.mid}</div>
-    <div class="lvl l3">${p.base}</div>
+    <div class="lvl l1">${esc(p.top)}</div>
+    <div class="lvl l2">${esc(p.mid)}</div>
+    <div class="lvl l3">${esc(p.base)}</div>
   </div>${data.cierre ? closer(data.cierre) : ''}`;
 }
 
 // ---------- PROCESO ----------
 export function proceso(data) {
-  const steps = data.steps.map((s, i) => `
+  const steps = data.steps.slice(0, 6).map((s, i) => `
     <div class="step"><div class="node">${i + 1}</div><div class="line"></div>
-      <div class="lbl">${s}</div></div>`).join('');
+      <div class="lbl">${esc(s)}</div></div>`).join('');
   return `<style>
     .proc { display: flex; flex-direction: column; }
     .step { display: flex; align-items: flex-start; gap: 24px; position: relative; padding-bottom: 22px; }
