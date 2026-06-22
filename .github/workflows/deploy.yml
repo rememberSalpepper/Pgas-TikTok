@@ -4,6 +4,9 @@ name: Deploy al VPS
 on:
   push:
     branches: [main]
+    paths-ignore:        # cambios solo de documentación no redepliegan
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
 
 jobs:
