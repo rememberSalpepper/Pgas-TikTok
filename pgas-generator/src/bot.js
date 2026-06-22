@@ -12,6 +12,7 @@ import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildCaption } from './caption.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CSV = process.env.PGAS_CSV || join(ROOT, '..', 'pgas_ideas.csv');
@@ -27,7 +28,8 @@ const AYUDA = [
   '🤖 *Comandos PGAS*',
   '/estado — resumen de ideas (pendientes/listas/enviadas)',
   '/generar [N] — genera N ideas nuevas con Codex (default 14)',
-  '/enviar [N] — envía N posts listos (o todos)',
+  '/enviar [N] — envía N posts listos (imagen + texto)',
+  '/textos [N] — envía solo el texto (sin imagen), para revisar',
   '/siguiente — envía el próximo post',
   '/borrar <id> — elimina una idea (ej. /borrar PGAS-IDEA-024)',
   '/ayuda — esta lista',
@@ -116,6 +118,21 @@ async function handle(chat, text) {
       } finally { busy = false; }
       return;
     }
+    case '/textos': {
+      // Solo texto (título + descripción), sin imagen. No cambia el estado (es para revisar/copiar).
+      let targets = readRows().filter((r) => r.estado === 'renderizado');
+      const n = parseInt(arg, 10);
+      if (n) targets = targets.slice(0, n);
+      if (targets.length === 0) return reply(chat, 'No hay ideas listas (estado renderizado) para mostrar.');
+      await reply(chat, `📝 ${targets.length} idea(s) en texto (sin imagen):`);
+      for (const r of targets) {
+        const titulo = (r.hook || r.titulo).replace(/\*(.+?)\*/g, '$1');
+        await api('sendMessage', { chat_id: chat, text: titulo });
+        await api('sendMessage', { chat_id: chat, text: buildCaption(r), disable_web_page_preview: true });
+        await sleep(500);
+      }
+      return;
+    }
     case '/borrar':
       if (!arg) return reply(chat, 'Uso: /borrar PGAS-IDEA-024');
       return reply(chat, borrar(arg));
@@ -132,7 +149,8 @@ async function main() {
   await api('setMyCommands', { commands: [
     { command: 'estado', description: 'Resumen de ideas (pendientes/listas/enviadas)' },
     { command: 'generar', description: 'Genera N ideas nuevas con Codex (default 14)' },
-    { command: 'enviar', description: 'Envia N posts listos (o todos)' },
+    { command: 'enviar', description: 'Envia N posts listos (imagen + texto)' },
+    { command: 'textos', description: 'Envia solo el texto (sin imagen), para revisar' },
     { command: 'siguiente', description: 'Envia el proximo post' },
     { command: 'borrar', description: 'Elimina una idea por id' },
     { command: 'ayuda', description: 'Lista de comandos' },
