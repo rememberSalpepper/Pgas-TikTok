@@ -9,6 +9,7 @@ pgas-generator/dist
 pgas-generator/.env
 pgas_ideas.csv
 *.backup*.csv
+data/
 
 # Insumos de referencia
 WhatsApp Image*.jpeg
