@@ -9,6 +9,7 @@ import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:http';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -136,6 +137,16 @@ async function main() {
     { command: 'borrar', description: 'Elimina una idea por id' },
     { command: 'ayuda', description: 'Lista de comandos' },
   ] }).catch(() => {});
+
+  // Servidor de salud (para el healthcheck del VPS: curl http://127.0.0.1:PUERTO).
+  const PORT = process.env.PORT || 3000;
+  createServer((req, res) => {
+    const rows = (() => { try { return readRows(); } catch { return []; } })();
+    const c = { total: rows.length, pendiente: 0, renderizado: 0, enviado: 0 };
+    for (const r of rows) if (c[r.estado] !== undefined) c[r.estado]++;
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ ok: true, servicio: 'pgas-bot', ...c }));
+  }).listen(PORT, () => console.log(`Salud en :${PORT}`));
 
   // Descarta mensajes viejos: arranca desde el último update.
   let offset = 0;

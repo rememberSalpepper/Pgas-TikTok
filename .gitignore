@@ -10,6 +10,10 @@ pgas-generator/node_modules/
 pgas-generator/dist/*
 !pgas-generator/dist/.gitkeep
 
+# CSV vivo: lo maneja el programa en cada máquina (el VPS tiene el suyo).
+# La semilla pgas_ideas.seed.csv SÍ se versiona.
+/pgas_ideas.csv
+
 # Respaldos del CSV
 *.backup*.csv
 

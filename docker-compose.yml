@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+    image: pgas-tiktok:latest
+    container_name: pgas-tiktok
+    restart: unless-stopped
+    env_file:
+      - pgas-generator/.env
+    ports:
+      - "3010:3000"          # salud: curl http://127.0.0.1:3010
+    volumes:
+      # Datos persistentes (sobreviven a rebuilds del contenedor)
+      - ./data/pgas_ideas.csv:/app/pgas_ideas.csv
+      - ./data/dist:/app/pgas-generator/dist
+      # Sesión de Codex montada desde el host (ya autenticada con `codex login`)
+      - /home/srv/.codex:/root/.codex
